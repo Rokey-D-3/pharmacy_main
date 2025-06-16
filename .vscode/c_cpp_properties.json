@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/choin/ros2_ws/install/pharmacy_msgs/include/**",
+        "/home/choin/ros2_ws/install/pharmacy_bot/include/**",
+        "/home/choin/ros2_ws/install/dsr_realtime_control/include/**",
+        "/home/choin/ros2_ws/install/dsr_controller2/include/**",
+        "/home/choin/ros2_ws/install/dsr_msgs2/include/**",
+        "/home/choin/ros2_ws/install/dsr_hardware2/include/**",
+        "/home/choin/turtlebot4_ws/install/turtlebot4_node/include/**",
+        "/home/choin/turtlebot4_ws/install/turtlebot4_msgs/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/choin/ros2_ws/src/DoosanBootcamp3rd/dsr_common2/include/**",
+        "/home/choin/ros2_ws/src/DoosanBootcamp3rd/dsr_controller2/include/**",
+        "/home/choin/ros2_ws/src/DoosanBootcamp3rd/dsr_example2/dsr_realtime_control/include/**",
+        "/home/choin/ros2_ws/src/DoosanBootcamp3rd/dsr_hardware2/include/**",
+        "/home/choin/ros2_ws/src/pharmacy_msgs/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

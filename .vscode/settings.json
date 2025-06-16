@@ -1,0 +1,36 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/choin/ros2_ws/install/pharmacy_msgs/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/rokey/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/pick_and_place_voice/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/pick_and_place_text/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/pharmacy_bot/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/od_msg/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/dsr_visualservoing/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/dsr_tests/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/dsr_bringup2/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/dsr_msgs2/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/dsr_example/lib/python3.10/site-packages",
+        "/home/choin/turtlebot4_ws/install/turtlebot4_navigation/local/lib/python3.10/dist-packages",
+        "/home/choin/turtlebot4_ws/install/turtlebot4_msgs/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/choin/ros2_ws/install/pharmacy_msgs/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/rokey/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/pick_and_place_voice/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/pick_and_place_text/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/pharmacy_bot/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/od_msg/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/dsr_visualservoing/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/dsr_tests/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/dsr_bringup2/lib/python3.10/site-packages",
+        "/home/choin/ros2_ws/install/dsr_msgs2/local/lib/python3.10/dist-packages",
+        "/home/choin/ros2_ws/install/dsr_example/lib/python3.10/site-packages",
+        "/home/choin/turtlebot4_ws/install/turtlebot4_navigation/local/lib/python3.10/dist-packages",
+        "/home/choin/turtlebot4_ws/install/turtlebot4_msgs/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}
