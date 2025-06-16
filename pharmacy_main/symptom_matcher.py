@@ -29,7 +29,7 @@ class SymptomMatcher(Node):
             self.get_logger().error("OPENAI_API_KEY가 설정되지 않았습니다.")
             return
 
-        db_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/resource/chroma_db")
+        db_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/chroma_db")
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0.3, openai_api_key=openai_api_key)
         self.embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
         self.db = Chroma(persist_directory=db_path, embedding_function=self.embeddings)
@@ -107,7 +107,7 @@ class SymptomMatcher(Node):
             return "추천 실패"
 
     def handle_symptom_request(self, request, response):
-        symptom_path = os.path.expanduser("/home/choin/ros2_ws/src/pharmacy_bot/resource/symptom_query.txt")
+        symptom_path = os.path.expanduser("/home/choin/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
         try:
             with open(symptom_path, "r", encoding="utf-8") as f:
                 symptom = f.read().strip()

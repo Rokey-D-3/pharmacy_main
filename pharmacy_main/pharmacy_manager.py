@@ -44,7 +44,7 @@ class PharmacyManager(Node):
         # 2. '__DONE__' 신호가 오면 symptom_query.txt 읽고 약 추천 수행
         if user_input == "__DONE__":
             try:
-                path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/resource/symptom_query.txt")
+                path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
                 with open(path, "r", encoding="utf-8") as f:
                     symptom_text = f.read().strip()
                 self.get_logger().info(f"최종 증상 텍스트: {symptom_text}")

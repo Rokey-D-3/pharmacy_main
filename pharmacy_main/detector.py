@@ -111,8 +111,11 @@ class DetectorNode(Node):
         YOLO 모델과 클래스 ID ↔ 이름 매핑 정보를 로드
         """
         package_path = get_package_share_directory("pharmacy_bot")
-        model_path = os.path.join(package_path, "resource", "best.pt")
-        class_path = os.path.join(package_path, "resource", "class_name.json")
+        model_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/best.tp")
+        class_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/class_name.json")
+        
+        # model_path = os.path.join(package_path, "resource", "best.pt")
+        # class_path = os.path.join(package_path, "resource", "class_name.json")
 
         model = YOLO(model_path)
 

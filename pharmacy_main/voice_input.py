@@ -55,7 +55,7 @@ class MicController:
 # ───── Wake word 감지 ─────
 class WakeupWord:
     def __init__(self, buffer_size):
-        model_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/resource/hello_rokey_8332_32.tflite")
+        model_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/hello_rokey_8332_32.tflite")
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"모델 없음: {model_path}")
         self.model = Model(wakeword_models=[model_path])
@@ -106,7 +106,7 @@ class VoiceInputNode(Node):
     def __init__(self):
         super().__init__('voice_input')
 
-        env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/.env")
+        env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/.env")
         load_dotenv(dotenv_path=env_path)
         self.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -152,7 +152,7 @@ class VoiceInputNode(Node):
                     user_input = stt.speech2text()
                     if not user_input:
                         fail_count += 1
-                        self.speak("죄송해요. 다시 말씀해주시겠어요? ({fail_count}/{MAX_FAIL})")
+                        self.speak("죄송해요. 다시 말씀해주시겠어요?")
                         if fail_count >= MAX_FAIL:
                             self.speak("여러 번 이해하지 못했어요. 로봇을 다시 실행해 주세요.")
                             mic.close_stream()
@@ -179,7 +179,7 @@ class VoiceInputNode(Node):
         if not self.symptom_list:
             return
         query = " 그리고 ".join(self.symptom_list)
-        resource_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/resource/symptom_query.txt")
+        resource_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
         with open(resource_path, "w", encoding="utf-8") as f:
             f.write(query)
         self.get_logger().info(f"증상 저장 완료 → {resource_path}")
