@@ -19,6 +19,8 @@
   <exec_depend>openwakeword</exec_depend>
   <exec_depend>openai</exec_depend>
 
+  <depend>pharmacy_msgs</depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
