@@ -59,17 +59,28 @@ class PharmacyManager(Node):
                 self.get_logger().info("약 추천 대기중...")
                 return
             
-            self.get_logger().info(f"추천된 약: {recommended}")
-            gui_msg = ", ".join(recommended)
-            self.recommend_pub.publish(String(data=gui_msg))
+            # self.get_logger().info(f"추천된 약: {recommended}")
 
-            self.process_medicine(recommended)
+
+
+            # gui_msg = ", ".join(recommended)
+            # self.recommend_pub.publish(String(data=gui_msg))
+            # print('debugging11')
+            # for num, recommend in enumerate(recommended):
+            # #여기서 for문으로 개별 처리
+            #     self.get_logger().info(f"{num+1}번째 : {recommend} 프로세스 실행....") 
+            #     self.process_medicine([recommend])
+            # ##
+
+            # print('debugging22')
             return
 
         # 그 외에는 단순 텍스트 로그만
         self.get_logger().info(f"(참고용) 입력 수신: \"{user_input}\"")
 
     def process_medicine(self, medicine_name: str):
+
+        
         result = self.call_detect_position(medicine_name)
         if not result:
             self.get_logger().error("약 위치 탐지 실패")
@@ -113,9 +124,27 @@ class PharmacyManager(Node):
             try:
                 result = fut.result()
                 if result and result.medicine:
-                    self.get_logger().info(f"추천된 약!: {result.medicine}")
-                    self.process_medicine(result.medicine)
+                    recommended = result.medicine
 
+                    self.get_logger().info(f"-추천된 약 : {recommended}")
+
+
+                    gui_msg = ", ".join(recommended)
+                    self.recommend_pub.publish(String(data=gui_msg))
+                    print('debugging11')
+                    for num, recommend in enumerate(recommended):
+                    #여기서 for문으로 개별 처리
+                        self.get_logger().info(f"{num+1}번째 : {recommend} 프로세스 실행....") 
+                        self.process_medicine([recommend])
+
+
+                    # self.process_medicine(result.medicine)
+
+
+
+
+
+                    print('뿅')
                 else:
                     self.get_logger().info("약 정보 대기중")
             except Exception as e:
@@ -124,7 +153,7 @@ class PharmacyManager(Node):
 
 
         # rclpy.spin_until_future_complete(self, future)
-        return future.result().medicine if future.result() else None
+        # return future.result().medicine if future.result() else None
 
     def call_detect_position(self, medicine):
         if not self.detect_position_client.wait_for_service(timeout_sec=2.0):
