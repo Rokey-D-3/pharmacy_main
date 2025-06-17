@@ -23,7 +23,7 @@ TOOLCHARGER_IP = "192.168.1.1"
 TOOLCHARGER_PORT = "502"
 gripper = RG(GRIPPER_NAME, TOOLCHARGER_IP, TOOLCHARGER_PORT)
 
-WIDTH_MARGIN = 50
+WIDTH_MARGIN = 70
 GRIP_MARGIN = 10
 # ─────────────── DSR API 초기화 ───────────────
 DR_init.__dsr__id = ROBOT_ID
@@ -198,7 +198,7 @@ class RobotArm(Node):
         mwait()
 
         # modify position if needed
-        self.move_rel(0, -30, 0)
+        self.move_rel(0, -50, 0)
 
         # gripper grip with width
         # need to optimize gripping force
@@ -212,7 +212,7 @@ class RobotArm(Node):
         mwait()
 
         # movel Y-780 place
-        movel(posx([target.x, target.y+50, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+        movel(posx([target.x, target.y+100, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
         
 

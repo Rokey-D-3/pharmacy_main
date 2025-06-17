@@ -55,7 +55,7 @@ class PharmacyManager(Node):
             recommended = self.call_get_medicine_name(symptom_text)
 
             if not recommended:
-                self.get_logger().error("약 추천 실패")
+                self.get_logger().info("약 추천 대기중...")
                 return
             
             self.get_logger().info(f"추천된 약: {recommended}")
@@ -75,19 +75,23 @@ class PharmacyManager(Node):
             return
 
         position, width = result
-        point = Point()
-        point.x, point.y, point.z = position
+
+
+        # point = Point()
+        # point.x, point.y, point.z = position
         # point.orientation.w = 1.0
         # temp=[]
         # temp.append(width)
-        self.get_logger().info(f"{medicine_name}의 위치: {point}")
-        self.get_logger().info(f"{medicine_name}의 폭: {width[0]}")
-        self.get_logger().info(f"{medicine_name}: {type(width)}")
+
+        
+        self.get_logger().info(f"{medicine_name}의 위치: {position}")
+        self.get_logger().info(f"{medicine_name}의 폭: {width}")
+        # self.get_logger().info(f"{medicine_name}: {type(width)}")
         # self.get_logger().info(f"temp0: {temp[0]}")
         # self.get_logger().info(f"temp1: {temp[1]}")
         # self.get_logger().info(f"temp: {type(temp)}")
         
-        success = self.call_pickup([point], width)
+        success = self.call_pickup(position, width)
         if success:
             self.get_logger().info("약 집기 성공")
         else:
@@ -146,8 +150,16 @@ class PharmacyManager(Node):
         rclpy.spin_until_future_complete(self, future)
 
         result = future.result()
-        if not result or sum(result.depth_position) == 0.0:
-            return None
+
+
+        print("reslut_test : ",result)
+
+
+        # if not result or sum(result.depth_position) == 0.0:
+        #     return None
+        
+
+
         print('!asdfasdf')
         return result.depth_position, result.width
 

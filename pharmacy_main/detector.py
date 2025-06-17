@@ -11,7 +11,7 @@ import numpy as np
 import time
 import json
 import os
-
+from geometry_msgs.msg import Point
 from ament_index_python.packages import get_package_share_directory
 
 
@@ -132,17 +132,29 @@ class DetectorNode(Node):
         """
         클라이언트 요청: 약 이름(target)을 받고 해당 약의 3D 위치 반환
         """
-        target = request.target
-        print('target 리스트 : ',target)
-        target = target[0]
-        print('first target : ',target)
-        self.get_logger().info(f"감지 요청: {target}")
-        coords = self._compute_position(target)
-        width = self.medicine_widths.get(target, 0.03)
-        response.depth_position = [float(x) for x in coords]
-        response.width = [int(width)]
+        targets = request.target
+        # target = request.target
+        print('target 리스트 : ',targets)
+        # target = target[0]
+        depth_positions = []
+        widths = []
+
+        for target in targets:
+            point = Point()
+            self.get_logger().info(f"감지 요청: {target}")
+            coords = self._compute_position(target)
+            x,y,z = coords
+            width = self.medicine_widths.get(target, 0.03)
+            point.x, point.y, point.z = x,y,z
+            depth_positions.append(point)
+            widths.append(width)
+        for i, j in zip(depth_positions, widths):
+            print(i,"\t" ,j,"\n")
+        response.depth_position = depth_positions
+        response.width = widths
         # print('변환된 pose : ', coords)
         print('그리퍼 width', width)
+        print(f"response.depth_position : \t{response.depth_position}")
         return response
 
     def _compute_position(self, target):
