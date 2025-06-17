@@ -76,7 +76,7 @@ class SymptomMatcher(Node):
             당신은 반드시 다음 약물명(한글명)만 추천할 수 있습니다. 영어 이름으로 절대 출력하지 마세요.
 
             출력 가능한 약물명 리스트:
-            ["모드콜", "콜대원", "하이펜", "타이레놀", "다제스", "락토프린", "포비돈", "미니온", "퓨어밴드", "Rohto C3 Cube"]
+            ["모드콜", "콜대원", "하이펜", "타이레놀", "다제스", "락토프린", "포비돈", "미니온", "퓨어밴드", "rohto c3 cube"]
 
             약물 복용 안내:
             - 모드콜: 하루 3회, 1회 1정 복용. 졸림 유발 가능, 운전 주의.
@@ -88,7 +88,7 @@ class SymptomMatcher(Node):
             - 포비돈: 상처 부위에 적당량 도포. 사용 후 밀봉 보관.
             - 미니온: 통증 부위에 1일 1회 부착. 피부 트러블 시 제거.
             - 퓨어밴드: 상처 부위에 부착. 오염 시 교체.
-            - Rohto C3 Cube: 1회 1~2방울, 1일 3~5회 점안. 사용 후 바로 뚜껑 닫기.
+            - rohto c3 cube: 1회 1~2방울, 1일 3~5회 점안. 사용 후 바로 뚜껑 닫기.
 
             <사용자 증상>
             {symptom}
@@ -125,6 +125,7 @@ class SymptomMatcher(Node):
 
 
     def handle_symptom_request(self, request, response):
+        self.get_logger().info("handle_symptom_request 호출됨")
         symptom_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
         try:
             with open(symptom_path, "r", encoding="utf-8") as f:
@@ -155,6 +156,7 @@ class SymptomMatcher(Node):
             self.get_logger().error(f"추천 중 오류 발생: {e}")
             response.medicine = []
 
+        self.get_logger().info(f"응답으로 보낼 약 리스트: {drug_name}")
         return response
 
 
