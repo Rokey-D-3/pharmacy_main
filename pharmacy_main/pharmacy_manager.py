@@ -38,6 +38,7 @@ class PharmacyManager(Node):
         # 1. 약 이름이면 바로 집기
         if user_input in AVAILABLE_DRUGS:
             self.get_logger().info(f"약 이름 직접 언급됨: {user_input}")
+            user_input = [user_input]
             self.process_medicine(user_input)
             return
 
