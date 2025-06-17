@@ -91,17 +91,18 @@ class DetectorNode(Node):
             self.handle_get_depth
             )
 
+        # 0.1mm 단위
         self.medicine_widths = {
-            "모드콜": 0.071,
-            "콜대원": 0.055,
-            "하이펜": 0.070,
-            "타이레놀": 0.066,
-            "다제스": 0.069,
-            "락토프린": 0.066,
-            "포비돈": 0.037,
-            "미니온": 0.080,
-            "퓨어밴드": 0.073,
-            "rohto c3 cube": 0.062
+            "모드콜": 710,
+            "콜대원": 550,
+            "하이펜": 700,
+            "타이레놀": 660,
+            "다제스": 690,
+            "락토프린": 660,
+            "포비돈": 370,
+            "미니온": 800,
+            "퓨어밴드": 730,
+            "rohto c3 cube": 620
         }
 
         self.get_logger().info("DetectorNode with YOLO + Realsense initialized.")
