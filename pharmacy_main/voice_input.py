@@ -82,7 +82,7 @@ class WakeupWord:
 class STT:
     def __init__(self, api_key):
         self.api_key = api_key
-        self.duration = 2
+        self.duration = 3
         self.samplerate = 16000
 
     def speech2text(self):
@@ -145,10 +145,10 @@ class VoiceInputNode(Node):
 
         while rclpy.ok():
             if wakeup.is_wakeup():
-                # self.speak("안녕하세요, 약 이름 또는 증상을 말씀해주세요." \
+                self.speak("안녕하세요, 약 이름 또는 증상을 말씀해주세요.") 
                 #  "종료하려면 '없어요', '아니요' 또는 '종료' 라고 말해주세요." \
                 #  "10초간 아무 말씀이 없으시면 자동 종료됩니다.")
-                self.speak("안녕")
+                # self.speak("안녕")
                 while True:
                     user_input = stt.speech2text()
                     if not user_input:

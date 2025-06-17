@@ -35,12 +35,12 @@ class PharmacyManager(Node):
     def symptom_callback(self, msg: String):
         user_input = msg.data.strip()
 
-        # 1. 약 이름이면 바로 집기
-        if user_input in AVAILABLE_DRUGS:
-            self.get_logger().info(f"약 이름 직접 언급됨: {user_input}")
-            user_input = [user_input]
-            self.process_medicine(user_input)
-            return
+        # 1. 약 이름이면 바로 집기  <- 삭제 예정
+        # if user_input in AVAILABLE_DRUGS:
+        #     self.get_logger().info(f"약 이름 직접 언급됨: {user_input}")
+        #     user_input = [user_input]
+        #     self.process_medicine(user_input)
+        #     return
 
         # 2. '__DONE__' 신호가 오면 symptom_query.txt 읽고 약 추천 수행
         if user_input == "__DONE__":
@@ -60,8 +60,8 @@ class PharmacyManager(Node):
                 return
             
             self.get_logger().info(f"추천된 약: {recommended}")
-
-            # self.recommend_pub.publish(String(data=recommended))
+            gui_msg = ", ".join(recommended)
+            self.recommend_pub.publish(String(data=gui_msg))
 
             self.process_medicine(recommended)
             return

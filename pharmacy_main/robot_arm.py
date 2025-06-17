@@ -15,7 +15,7 @@ import DR_init
 # ─────────────── 로봇 및 그리퍼 설정 ───────────────
 ROBOT_ID = "dsr01"
 ROBOT_MODEL = "m0609"
-VELOCITY, ACC = 30, 30
+VELOCITY, ACC = 80, 80
 
 # OnRobot RG2 그리퍼 설정
 GRIPPER_NAME = "rg2"
