@@ -8,7 +8,7 @@ from pharmacy_msgs.srv import GetMedicineName, PickupMedicine, SrvDepthPosition
 
 AVAILABLE_DRUGS = [
     "모드콜", "콜대원", "하이펜", "타이레놀", "다제스",
-    "락토프린", "포비돈", "미니온", "퓨어밴드", "Rohto C3 Cube"
+    "락토프린", "포비돈", "미니온", "퓨어밴드", "rohto c3 cube"
 ]
 
 class PharmacyManager(Node):
