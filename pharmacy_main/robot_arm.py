@@ -284,7 +284,7 @@ class RobotArm(Node):
                 self.get_logger().error(f"실패: {str(e)}")
                 response.success = False
                 break
-        self.serve()
+        # self.serve()
         self.init_robot()
         return response
 
