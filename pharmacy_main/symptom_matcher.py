@@ -17,6 +17,8 @@ from std_msgs.msg import String
 class SymptomMatcher(Node):
     def __init__(self):
         super().__init__('symptom_matcher')
+                                    
+        env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/.env")
 
         # .env 로드 및 OpenAI 키 확인
         env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/.env")
@@ -103,18 +105,26 @@ class SymptomMatcher(Node):
         result = self.llm.invoke(prompt.format(symptom=symptom, context=context))
         return result.content.strip()
 
-    def extract_drug_names(self, text: str) -> list:
-        """텍스트에서 약 이름 리스트를 추출"""
+    # def extract_first_drug_name(self, text: str) -> str:
+    #     try:
+    #         name_section = text.split("약 이름:")[1].split("]")[0]
+    #         drug_list = name_section.replace("[", "").split(",")
+    #         return drug_list[0].strip()
+    #     except Exception as e:
+    #         self.get_logger().error(f"약 이름 추출 실패: {e}")
+    #         return "추천 실패"
+
+    def extract_drug_names(self, text: str) -> list[str]:
         try:
             name_section = text.split("약 이름:")[1].split("]")[0]
             drug_list = name_section.replace("[", "").split(",")
-            return [name.strip() for name in drug_list if name.strip()]
+            return [name.strip() for name in drug_list]
         except Exception as e:
-            self.get_logger().error(f"약 이름 리스트 추출 실패: {e}")
+            self.get_logger().error(f"약 이름 추출 실패: {e}")
             return []
 
+
     def handle_symptom_request(self, request, response):
-        """GetMedicineName 서비스 콜백"""
         symptom_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
         try:
             with open(symptom_path, "r", encoding="utf-8") as f:
@@ -139,9 +149,8 @@ class SymptomMatcher(Node):
 
             self.result_pub.publish(String(data=result_text))  # GUI에 전체 출력용
 
-            drug_names = self.extract_drug_names(result_text)
-            response.medicine = drug_names
-            self.get_logger().info(f"최종 응답 약 리스트: {response.medicine}")
+            drug_name = self.extract_drug_names(result_text)
+            response.medicine = drug_name
         except Exception as e:
             self.get_logger().error(f"추천 중 오류 발생: {e}")
             response.medicine = []
