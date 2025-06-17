@@ -25,7 +25,8 @@ setup(
             'voice_input = pharmacy_main.voice_input:main',
             'symptom_matcher = pharmacy_main.symptom_matcher:main',
             'detector = pharmacy_main.detector:main',
-            'robot_arm = pharmacy_main.robot_arm:main'
+            'robot_arm = pharmacy_main.robot_arm:main',
+            'move_test = pharmacy_main.move_test:main',
         ],
     },
 )
