@@ -15,7 +15,7 @@ class PharmacyManager(Node):
     def __init__(self):
         super().__init__('pharmacy_manager')
 
-        # 증상 또는 약 이름 수신
+        # 사용자 발화 구독
         self.subscription = self.create_subscription(
             String,
             '/symptom_text',
@@ -23,25 +23,26 @@ class PharmacyManager(Node):
             10
         )
 
-        # 필요한 서비스 클라이언트 생성
+        # 서비스 클라이언트 설정
         self.get_medicine_client = self.create_client(GetMedicineName, '/get_medicine_name')
         self.detect_position_client = self.create_client(SrvDepthPosition, '/get_3d_position')
         self.pickup_client = self.create_client(PickupMedicine, '/pickup_medicine')
 
+        # 추천 결과 퍼블리시 (GUI용)
         self.recommend_pub = self.create_publisher(String, '/recommended_drug', 10)
-        
+
         self.get_logger().info("PharmacyManager 실행됨 — 사용자 입력 대기 중")
 
     def symptom_callback(self, msg: String):
         user_input = msg.data.strip()
 
-        # 1. 약 이름이면 바로 집기
+        # 1. 약 이름 직접 언급 시 → 즉시 처리
         if user_input in AVAILABLE_DRUGS:
             self.get_logger().info(f"약 이름 직접 언급됨: {user_input}")
             self.process_medicine(user_input)
             return
 
-        # 2. '__DONE__' 신호가 오면 symptom_query.txt 읽고 약 추천 수행
+        # 2. 증상 입력 종료 신호
         if user_input == "__DONE__":
             try:
                 path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
@@ -52,19 +53,21 @@ class PharmacyManager(Node):
                 self.get_logger().error(f"symptom_query.txt 로딩 실패: {e}")
                 return
 
+            # 추천 약 요청 → 리스트로 받음
             recommended = self.call_get_medicine_name(symptom_text)
             if not recommended:
-                self.get_logger().error("약 추천 실패")
+                self.get_logger().info("약 추천 대기중...")
                 return
-            
-            self.get_logger().info(f"추천된 약: {recommended}")
 
-            self.recommend_pub.publish(String(data=recommended))
+            for drug in recommended:
+                self.get_logger().info(f"추천된 약: {drug}")
+                self.process_medicine(drug)
 
-            self.process_medicine(recommended)
+                # 결과를 GUI에도 보여주기 위해 전체 추천 결과 퍼블리시 (최초 한 번만)
+            self.recommend_pub.publish(String(data=", ".join(recommended)))
             return
 
-        # 그 외에는 단순 텍스트 로그만
+        # 그 외 일반 텍스트 (참고용 로그)
         self.get_logger().info(f"(참고용) 입력 수신: \"{user_input}\"")
 
     def process_medicine(self, medicine_name: str):
@@ -76,26 +79,45 @@ class PharmacyManager(Node):
         position, width = result
         point = Point()
         point.x, point.y, point.z = position
-        point.orientation.w = 1.0
+        point.orientation.w = 1.0  # 기본값 설정
 
-        self.get_logger().info(f"{medicine_name}의 폭: {width:.1f}")
-        
-        success = self.call_pickup(point, width)
+        self.get_logger().info(f"{medicine_name}의 위치: {point}")
+        self.get_logger().info(f"{medicine_name}의 폭: {width[0]}")
+        self.get_logger().info(f"{medicine_name}: {type(width)}")
+
+        success = self.call_pickup([point], width)
         if success:
-            self.get_logger().info("약 집기 성공")
+            self.get_logger().info(f"{medicine_name} 집기 성공")
         else:
-            self.get_logger().error("약 집기 실패")
+            self.get_logger().error(f"{medicine_name} 집기 실패")
 
-    def call_get_medicine_name(self, symptom: str) -> str:
+    def call_get_medicine_name(self, symptom: str) -> list:
         if not self.get_medicine_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().error("/get_medicine_name 서비스 연결 실패")
-            return None
+            return []
 
         request = GetMedicineName.Request()
         request.symptom = symptom
         future = self.get_medicine_client.call_async(request)
-        rclpy.spin_until_future_complete(self, future)
+
+        # 비동기 처리로 변경
+        def response_callback(fut):
+            try:
+                result = fut.result()
+                if result and result.medicine:
+                    self.get_logger().info(f"추천된 약: {result.medicine}")
+                    self.process_medicine(result.medicine)
+
+                else:
+                    self.get_logger().info("약 정보 대기중")
+            except Exception as e:
+                self.get_logger().error(f"서비스 응답 처리 중 예외 발생: {e}")
+        future.add_done_callback(response_callback)
+
+
+        # rclpy.spin_until_future_complete(self, future)
         return future.result().medicine if future.result() else None
+
 
     def call_detect_position(self, medicine: str):
         if not self.detect_position_client.wait_for_service(timeout_sec=2.0):
@@ -110,9 +132,10 @@ class PharmacyManager(Node):
         result = future.result()
         if not result or sum(result.depth_position) == 0.0:
             return None
+
         return result.depth_position, result.width
 
-    def call_pickup(self, point: Point, width: float) -> bool:
+    def call_pickup(self, point: Point, width) -> bool:
         if not self.pickup_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().error("/pickup_medicine 서비스 연결 실패")
             return False

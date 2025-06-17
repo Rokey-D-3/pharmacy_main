@@ -11,7 +11,6 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 
 # ROS 2 서비스
 from pharmacy_msgs.srv import GetMedicineName
-
 from std_msgs.msg import String
 
 
@@ -19,6 +18,7 @@ class SymptomMatcher(Node):
     def __init__(self):
         super().__init__('symptom_matcher')
 
+        # .env 로드 및 OpenAI 키 확인
         env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/.env")
         loaded = load_dotenv(dotenv_path=env_path)
         if not loaded:
@@ -29,16 +29,20 @@ class SymptomMatcher(Node):
             self.get_logger().error("OPENAI_API_KEY가 설정되지 않았습니다.")
             return
 
+        # LangChain 및 벡터 DB 초기화
         db_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/chroma_db")
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0.3, openai_api_key=openai_api_key)
         self.embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
         self.db = Chroma(persist_directory=db_path, embedding_function=self.embeddings)
         self.retriever = self.db.as_retriever(search_kwargs={"k": 3})
+
+        # 서비스 및 퍼블리셔 생성
         self.service = self.create_service(GetMedicineName, '/get_medicine_name', self.handle_symptom_request)
         self.result_pub = self.create_publisher(String, '/recommended_drug', 10)
         self.get_logger().info("SymptomMatcher 실행됨 (/get_medicine_name)")
 
     def translate_symptom(self, symptom: str) -> str:
+        """한글 증상을 영어 의학용어로 번역"""
         prompt = PromptTemplate(
             input_variables=["symptom"],
             template="""
@@ -51,17 +55,19 @@ class SymptomMatcher(Node):
         return translated.content.strip()
 
     def retrieve_context(self, translated_query: str) -> str:
+        """벡터 DB에서 관련 문서 검색"""
         docs = self.retriever.get_relevant_documents(translated_query)
         if not docs:
-            self.get_logger().warn("Vector DB에서 관련 문서를 찾지 못함.")  # 변경됨
-            return None  # 변경됨
-        for i, doc in enumerate(docs):  # 변경됨
-            self.get_logger().info(f"[유사 문서 {i+1}] {doc.page_content[:100]}...")  # 변경됨
+            self.get_logger().warn("Vector DB에서 관련 문서를 찾지 못함.")
+            return None
+        for i, doc in enumerate(docs):
+            self.get_logger().info(f"[유사 문서 {i+1}] {doc.page_content[:100]}...")
         return "\n".join([doc.page_content for doc in docs])
 
     def recommend_medicine(self, symptom: str, context: str) -> str:
-        if not context.strip():  # 변경됨
-            self.get_logger().warn("context 없이 전체 약 리스트 출력될 가능성 있음")  # 변경됨
+        """증상과 컨텍스트를 바탕으로 약 추천"""
+        if not context.strip():
+            self.get_logger().warn("context 없이 전체 약 리스트 출력될 가능성 있음")
         prompt = PromptTemplate(
             input_variables=["symptom", "context"],
             template="""
@@ -97,45 +103,48 @@ class SymptomMatcher(Node):
         result = self.llm.invoke(prompt.format(symptom=symptom, context=context))
         return result.content.strip()
 
-    def extract_first_drug_name(self, text: str) -> str:
+    def extract_drug_names(self, text: str) -> list:
+        """텍스트에서 약 이름 리스트를 추출"""
         try:
             name_section = text.split("약 이름:")[1].split("]")[0]
             drug_list = name_section.replace("[", "").split(",")
-            return drug_list[0].strip()
+            return [name.strip() for name in drug_list if name.strip()]
         except Exception as e:
-            self.get_logger().error(f"약 이름 추출 실패: {e}")
-            return "추천 실패"
+            self.get_logger().error(f"약 이름 리스트 추출 실패: {e}")
+            return []
 
     def handle_symptom_request(self, request, response):
-        symptom_path = os.path.expanduser("/home/choin/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
+        """GetMedicineName 서비스 콜백"""
+        symptom_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/symptom_query.txt")
         try:
             with open(symptom_path, "r", encoding="utf-8") as f:
                 symptom = f.read().strip()
             self.get_logger().info(f"증상 입력: {symptom}")
         except Exception as e:
             self.get_logger().error(f"symptom_query.txt 불러오기 실패: {e}")
-            response.medicine = "추천 실패"
+            response.medicine = []
             return response
 
         try:
             translated = self.translate_symptom(symptom)
-            self.get_logger().info(f"번역된 증상: {translated}")  # 변경됨
+            self.get_logger().info(f"번역된 증상: {translated}")
 
             context = self.retrieve_context(translated)
             if context is None:
-                response.medicine = "추천 실패 (관련 문서 없음)"  # 변경됨
+                response.medicine = []
                 return response
 
             result_text = self.recommend_medicine(symptom, context)
             self.get_logger().info(f"\n=== 약 추천 결과 ===\n{result_text}")
 
-            self.result_pub.publish(String(data=result_text))
+            self.result_pub.publish(String(data=result_text))  # GUI에 전체 출력용
 
-            drug_name = self.extract_first_drug_name(result_text)
-            response.medicine = drug_name
+            drug_names = self.extract_drug_names(result_text)
+            response.medicine = drug_names
+            self.get_logger().info(f"최종 응답 약 리스트: {response.medicine}")
         except Exception as e:
             self.get_logger().error(f"추천 중 오류 발생: {e}")
-            response.medicine = "추천 실패"
+            response.medicine = []
 
         return response
 

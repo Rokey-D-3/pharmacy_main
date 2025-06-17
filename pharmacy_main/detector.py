@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge
+from scipy.spatial.transform import Rotation
 
 # YOLO
 from ultralytics import YOLO
@@ -132,11 +133,15 @@ class DetectorNode(Node):
         클라이언트 요청: 약 이름(target)을 받고 해당 약의 3D 위치 반환
         """
         target = request.target.lower()
+        print('target 리스트 : ',target)
+        target = target[0]
+        print('first target : ',target)
         self.get_logger().info(f"감지 요청: {target}")
         coords = self._compute_position(target)
         width = self.medicine_widths.get(target, 0.03)
         response.depth_position = [float(x) for x in coords]
-        response.width = float(width)
+        response.width = int(width)
+        print('그리퍼 width', width)
         return response
 
     def _compute_position(self, target):
@@ -171,8 +176,41 @@ class DetectorNode(Node):
             return 0.0, 0.0, 0.0
 
         # 픽셀 좌표 + depth → 카메라 3D 좌표로 변환
-        return self._pixel_to_camera_coords(cx, cy, cz)
+        camera_coords = self._pixel_to_camera_coords(cx, cy, cz)
 
+        # 좌표 변환 파일 및 로봇 위치 설정
+        gripper2cam_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/T_gripper2camera.npy")
+        # robot_posx = get_current_posx()[0]
+        home_pose=[-140.48, -34.46, 146, 95.15, 49.70, -19.84]  # 홈 위치 조인트값
+        home_posx = [-80, -422.38, 276.88, 90, -100, -90]
+        target_pose = self.transform_to_base(camera_coords, gripper2cam_path, home_posx)
+        print('target_pose : ', target_pose)
+        return target_pose
+    
+    def transform_to_base(self, camera_coords, gripper2cam_path, robot_pos):
+        """
+        Converts 3D coordinates from the camera coordinate system
+        to the robot's base coordinate system.
+        """
+        gripper2cam = np.load(gripper2cam_path)
+        coord = np.append(np.array(camera_coords), 1)  # Homogeneous coordinate
+
+        x, y, z, rx, ry, rz = robot_pos
+        base2gripper = self.get_robot_pose_matrix(x, y, z, rx, ry, rz)
+
+        # 좌표 변환 (그리퍼 → 베이스)
+        base2cam = base2gripper @ gripper2cam
+        td_coord = np.dot(base2cam, coord)
+
+        return td_coord[:3]
+    
+    def get_robot_pose_matrix(self, x, y, z, rx, ry, rz):
+        R = Rotation.from_euler("ZYZ", [rx, ry, rz], degrees=True).as_matrix()
+        T = np.eye(4)
+        T[:3, :3] = R
+        T[:3, 3] = [x, y, z]
+        return T
+    
     def _aggregate_detections(self, results, conf_thresh=0.5, iou_thresh=0.5):
         """
         YOLO 결과에서 score가 일정 이상인 것만 추출

@@ -1,4 +1,4 @@
-#import rclpy
+import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point
 # from std_msgs.msg import UInt16
@@ -223,8 +223,7 @@ class RobotArm(Node):
         # # add place motion
 
         # # gripper release
-        # gripper.move_gripper(width + WIDTH_MARGIN, 400)
-        # self.gripper_wait_busy()
+        # gripper.movr_wait_busy()
     
     def put_target(self, width: int) -> None:
         # movej rel J0 90 deg for showing
