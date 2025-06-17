@@ -36,20 +36,11 @@ class PharmacyManager(Node):
     def symptom_callback(self, msg: String):
         user_input = msg.data.strip()
 
-<<<<<<< HEAD
         # 1. 약 이름 직접 언급 시 → 즉시 처리
-        if user_input in AVAILABLE_DRUGS:
-            self.get_logger().info(f"약 이름 직접 언급됨: {user_input}")
-            self.process_medicine(user_input)
-            return
-=======
-        # 1. 약 이름이면 바로 집기  <- 삭제 예정
         # if user_input in AVAILABLE_DRUGS:
         #     self.get_logger().info(f"약 이름 직접 언급됨: {user_input}")
-        #     user_input = [user_input]
         #     self.process_medicine(user_input)
         #     return
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 
         # 2. 증상 입력 종료 신호
         if user_input == "__DONE__":
@@ -64,21 +55,13 @@ class PharmacyManager(Node):
 
             # 추천 약 요청 → 리스트로 받음
             recommended = self.call_get_medicine_name(symptom_text)
-
             if not recommended:
                 self.get_logger().info("약 추천 대기중...")
                 return
-<<<<<<< HEAD
 
             for drug in recommended:
                 self.get_logger().info(f"추천된 약: {drug}")
                 self.process_medicine(drug)
-=======
-            
-            self.get_logger().info(f"추천된 약: {recommended}")
-            gui_msg = ", ".join(recommended)
-            self.recommend_pub.publish(String(data=gui_msg))
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 
                 # 결과를 GUI에도 보여주기 위해 전체 추천 결과 퍼블리시 (최초 한 번만)
             self.recommend_pub.publish(String(data=", ".join(recommended)))
@@ -94,7 +77,6 @@ class PharmacyManager(Node):
             return
 
         position, width = result
-<<<<<<< HEAD
         point = Point()
         point.x, point.y, point.z = position
         point.orientation.w = 1.0  # 기본값 설정
@@ -104,25 +86,6 @@ class PharmacyManager(Node):
         self.get_logger().info(f"{medicine_name}: {type(width)}")
 
         success = self.call_pickup([point], width)
-=======
-
-
-        # point = Point()
-        # point.x, point.y, point.z = position
-        # point.orientation.w = 1.0
-        # temp=[]
-        # temp.append(width)
-
-        
-        self.get_logger().info(f"{medicine_name}의 위치: {position}")
-        self.get_logger().info(f"{medicine_name}의 폭: {width}")
-        # self.get_logger().info(f"{medicine_name}: {type(width)}")
-        # self.get_logger().info(f"temp0: {temp[0]}")
-        # self.get_logger().info(f"temp1: {temp[1]}")
-        # self.get_logger().info(f"temp: {type(temp)}")
-        
-        success = self.call_pickup(position, width)
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         if success:
             self.get_logger().info(f"{medicine_name} 집기 성공")
         else:
@@ -137,20 +100,12 @@ class PharmacyManager(Node):
         request.symptom = symptom
         future = self.get_medicine_client.call_async(request)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         # 비동기 처리로 변경
         def response_callback(fut):
             try:
                 result = fut.result()
                 if result and result.medicine:
-<<<<<<< HEAD
                     self.get_logger().info(f"추천된 약: {result.medicine}")
-=======
-                    self.get_logger().info(f"추천된 약!: {result.medicine}")
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
                     self.process_medicine(result.medicine)
 
                 else:
@@ -163,12 +118,8 @@ class PharmacyManager(Node):
         # rclpy.spin_until_future_complete(self, future)
         return future.result().medicine if future.result() else None
 
-<<<<<<< HEAD
 
     def call_detect_position(self, medicine: str):
-=======
-    def call_detect_position(self, medicine):
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         if not self.detect_position_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().error("/get_3d_position 서비스 연결 실패")
             return None
@@ -176,40 +127,12 @@ class PharmacyManager(Node):
         request = SrvDepthPosition.Request()
         request.target = medicine
         future = self.detect_position_client.call_async(request)
-
-        # 비동기 처리로 변경
-        # def response_callback(fut):
-        #     try:
-        #         result = fut.result()
-        #         if result :
-        #             self.get_logger().info(f"약 위치 정보: {result.depth_position}")
-        #             self.get_logger().info(f"그리퍼 넓이 정보: {result.width}")
-        #             self.process_medicine(result.medicine)
-        #         else:
-        #             self.get_logger().info("타깃 정보 대기중")
-        #     except Exception as e:
-        #         self.get_logger().error(f"서비스 응답 처리 중 예외 발생: {e}")
-        # future.add_done_callback(response_callback)
         rclpy.spin_until_future_complete(self, future)
 
         result = future.result()
-<<<<<<< HEAD
         if not result or sum(result.depth_position) == 0.0:
             return None
 
-=======
-
-
-        print("reslut_test : ",result)
-
-
-        # if not result or sum(result.depth_position) == 0.0:
-        #     return None
-        
-
-
-        print('!asdfasdf')
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         return result.depth_position, result.width
 
     def call_pickup(self, point: Point, width) -> bool:

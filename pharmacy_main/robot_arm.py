@@ -2,11 +2,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point
 # from std_msgs.msg import UInt16
-<<<<<<< HEAD
-from pharmacy_msgs.srv import PickupMedicine  # point, uint16 → bool 응답 서비스
-=======
 from pharmacy_msgs.srv import PickupMedicine  # Point[], UInt16[] → bool 응답 서비스
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 
 import time
 
@@ -19,11 +15,7 @@ import DR_init
 # ─────────────── 로봇 및 그리퍼 설정 ───────────────
 ROBOT_ID = "dsr01"
 ROBOT_MODEL = "m0609"
-<<<<<<< HEAD
-VELOCITY, ACC = 30, 30
-=======
 VELOCITY, ACC = 80, 80
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 
 # OnRobot RG2 그리퍼 설정
 GRIPPER_NAME = "rg2"
@@ -31,11 +23,7 @@ TOOLCHARGER_IP = "192.168.1.1"
 TOOLCHARGER_PORT = "502"
 gripper = RG(GRIPPER_NAME, TOOLCHARGER_IP, TOOLCHARGER_PORT)
 
-<<<<<<< HEAD
-WIDTH_MARGIN = 50
-=======
 WIDTH_MARGIN = 80
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 GRIP_MARGIN = 10
 # ─────────────── DSR API 초기화 ───────────────
 DR_init.__dsr__id = ROBOT_ID
@@ -210,11 +198,7 @@ class RobotArm(Node):
         mwait()
 
         # modify position if needed
-<<<<<<< HEAD
-        self.move_rel(0, -30, 0)
-=======
         self.move_rel(0, -40, 0)
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 
         # gripper grip with width
         # need to optimize gripping force
@@ -228,11 +212,7 @@ class RobotArm(Node):
         mwait()
 
         # movel Y-780 place
-<<<<<<< HEAD
-        movel(posx([target.x, target.y+50, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
-=======
         movel(posx([target.x, target.y+220, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         mwait()
         
 
@@ -243,12 +223,8 @@ class RobotArm(Node):
         # # add place motion
 
         # # gripper release
-<<<<<<< HEAD
-        # gripper.movr_wait_busy()
-=======
         # gripper.move_gripper(width + WIDTH_MARGIN, 400)
         # self.gripper_wait_busy()
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
     
     def put_target(self, width: int) -> None:
         # movej rel J0 90 deg for showing
@@ -293,22 +269,6 @@ class RobotArm(Node):
         그리퍼로 약 집기 -> 성공 여부 반환
         약을 집은 후 다시 초기 위치로 복귀
         """
-<<<<<<< HEAD
-        self.get_logger().info(
-            f"서비스 요청 수신: point=({request.point.x}, {request.point.y}, {request.point.z}), width={request.width}")
-        target = request.point
-        width = request.width
-
-        try:
-            self.pick_target(target, width)
-            self.put_target(width)
-            response.success = True
-            self.get_logger().info("완료")
-        except Exception as e:
-            self.get_logger().error(f"실패: {str(e)}")
-            response.success = False
-        
-=======
         
         targets = request.point
         widths = request.width
@@ -326,7 +286,6 @@ class RobotArm(Node):
                 break
         self.serve()
         self.init_robot()
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         return response
 
 def main(args=None):

@@ -4,10 +4,6 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge
 from scipy.spatial.transform import Rotation
-<<<<<<< HEAD
-
-=======
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 # YOLO
 from ultralytics import YOLO
 
@@ -117,13 +113,8 @@ class DetectorNode(Node):
         """
         YOLO 모델과 클래스 ID ↔ 이름 매핑 정보를 로드
         """
-<<<<<<< HEAD
-        package_path = get_package_share_directory("pharmacy_bot")
-        model_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/0613_2nd_best_11m.tp")
-=======
         # package_path = get_package_share_directory("pharmacy_bot")
         model_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/0613_2nd_best_11m.pt")
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         class_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/class_name.json")
         
         # model_path = os.path.join(package_path, "resource", "best.pt")
@@ -142,18 +133,6 @@ class DetectorNode(Node):
         """
         클라이언트 요청: 약 이름(target)을 받고 해당 약의 3D 위치 반환
         """
-<<<<<<< HEAD
-        target = request.target.lower()
-        print('target 리스트 : ',target)
-        target = target[0]
-        print('first target : ',target)
-        self.get_logger().info(f"감지 요청: {target}")
-        coords = self._compute_position(target)
-        width = self.medicine_widths.get(target, 0.03)
-        response.depth_position = [float(x) for x in coords]
-        response.width = int(width)
-        print('그리퍼 width', width)
-=======
         targets = request.target
         # target = request.target
         print('target 리스트 : ',targets)
@@ -177,7 +156,6 @@ class DetectorNode(Node):
         # print('변환된 pose : ', coords)
         print('그리퍼 width', width)
         print(f"response.depth_position : \t{response.depth_position}")
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
         return response
 
     def _compute_position(self, target):
@@ -207,10 +185,6 @@ class DetectorNode(Node):
             self.get_logger().warn("Depth unavailable.")
             return 0.0, 0.0, 0.0
 
-<<<<<<< HEAD
-        # 픽셀 좌표 + depth → 카메라 3D 좌표로 변환
-        camera_coords = self._pixel_to_camera_coords(cx, cy, cz)
-=======
         camera_coords = self._pixel_to_camera_coords(cx, cy, cz)
 
         # 좌표 변환 파일 및 로봇 위치 설정
@@ -246,7 +220,6 @@ class DetectorNode(Node):
         T[:3, :3] = R
         T[:3, 3] = [x, y, z]
         return T
->>>>>>> 7c5d8147a90407d9465d71a54c338df7b77964a3
 
         # 좌표 변환 파일 및 로봇 위치 설정
         gripper2cam_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/T_gripper2camera.npy")
