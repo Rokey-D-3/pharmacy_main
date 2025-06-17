@@ -1,22 +1,16 @@
-#!/usr/bin/env python3
-
-import rclpy
+#import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point
 # from std_msgs.msg import UInt16
-# from std_msgs.msg import Int8
 from pharmacy_msgs.srv import PickupMedicine  # point, uint16 → bool 응답 서비스
 
-# import numpy as np
 import time
-from scipy.spatial.transform import Rotation as R
 
 # OnRobot RG2 그리퍼 제어용 클래스
 from pharmacy_main.robot_control.onrobot import RG
 
 # DSR 로봇 API
 import DR_init
-# from DSR_ROBOT2 import movej, movel, get_current_posx, mwait, set_tool, set_tcp
 
 # ─────────────── 로봇 및 그리퍼 설정 ───────────────
 ROBOT_ID = "dsr01"
@@ -102,20 +96,7 @@ class RobotArm(Node):
         gripper.close_gripper(400)
         self.gripper_wait_busy()
         
-        ''' gripper
-        # gripper.close_gripper(100)
-        # self.gripper_wait_grip()
-        # print("1", gripper.get_width())
-        # self.move_rel(0,0,20)
-        # mwait()
-        
-        # gripper.move_gripper(710+WIDTH_MARGIN,400)
-        # self.gripper_wait_busy()
-        # print("2", gripper.get_width())
-        # self.move_rel(0,0,-20)
-        # mwait()
         '''
-        
         # # test code
         # target = Point()
         # target.x = 140.98
@@ -127,7 +108,7 @@ class RobotArm(Node):
         # self.put_target(width)
 
         # self.serve()
-
+        '''
 
     def move_rel(self, x, y, z, vel=VELOCITY, acc=ACC) -> None:
         movel(pos=[x, y, z, 0, 0, 0], vel=vel, acc=acc, mod=DR_MV_MOD_REL)
@@ -288,6 +269,8 @@ class RobotArm(Node):
         그리퍼로 약 집기 -> 성공 여부 반환
         약을 집은 후 다시 초기 위치로 복귀
         """
+        self.get_logger().info(
+            f"서비스 요청 수신: point=({request.point.x}, {request.point.y}, {request.point.z}), width={request.width}")
         target = request.point
         width = request.width
 
