@@ -78,10 +78,16 @@ class PharmacyManager(Node):
         point = Point()
         point.x, point.y, point.z = position
         # point.orientation.w = 1.0
+        # temp=[]
+        # temp.append(width)
         self.get_logger().info(f"{medicine_name}의 위치: {point}")
-        self.get_logger().info(f"{medicine_name}의 폭: {width}")
+        self.get_logger().info(f"{medicine_name}의 폭: {width[0]}")
+        self.get_logger().info(f"{medicine_name}: {type(width)}")
+        # self.get_logger().info(f"temp0: {temp[0]}")
+        # self.get_logger().info(f"temp1: {temp[1]}")
+        # self.get_logger().info(f"temp: {type(temp)}")
         
-        success = self.call_pickup(point, width)
+        success = self.call_pickup([point], width)
         if success:
             self.get_logger().info("약 집기 성공")
         else:
@@ -145,7 +151,7 @@ class PharmacyManager(Node):
         print('!asdfasdf')
         return result.depth_position, result.width
 
-    def call_pickup(self, point: Point, width: float) -> bool:
+    def call_pickup(self, point: Point, width) -> bool:
         if not self.pickup_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().error("/pickup_medicine 서비스 연결 실패")
             return False
