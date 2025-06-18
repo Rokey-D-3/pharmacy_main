@@ -128,7 +128,6 @@ class PharmacyManager(Node):
 
                     self.get_logger().info(f"-추천된 약 : {recommended}")
 
-
                     gui_msg = ", ".join(recommended)
                     self.recommend_pub.publish(String(data=gui_msg))
                     print('debugging11')
@@ -137,14 +136,13 @@ class PharmacyManager(Node):
                         self.get_logger().info(f"{num+1}번째 : {recommend} 프로세스 실행....") 
                         self.process_medicine([recommend])
 
-
+                    # 종료 확인용 dummy data
+                    dummy_point = [Point()]
+                    dummy_width = [10001]
+                    self.get_logger().info("모든 약 처리 후 serve() 트리거 전송")
+                    self.call_pickup(dummy_point, dummy_width)
                     # self.process_medicine(result.medicine)
 
-
-
-
-
-                    print('뿅')
                 else:
                     self.get_logger().info("약 정보 대기중")
             except Exception as e:

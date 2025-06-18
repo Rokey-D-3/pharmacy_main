@@ -143,10 +143,12 @@ class DetectorNode(Node):
         for target in targets:
             point = Point()
             self.get_logger().info(f"감지 요청: {target}")
+
             coords = self._compute_position(target)
             x,y,z = coords
             width = self.medicine_widths.get(target, 0.03)
             point.x, point.y, point.z = x,y,z
+            
             depth_positions.append(point)
             widths.append(width)
         for i, j in zip(depth_positions, widths):
