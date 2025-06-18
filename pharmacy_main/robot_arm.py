@@ -25,6 +25,13 @@ gripper = RG(GRIPPER_NAME, TOOLCHARGER_IP, TOOLCHARGER_PORT)
 
 WIDTH_MARGIN = 80
 GRIP_MARGIN = 10
+TARGET_MOVING_MARGIN = 50
+STAB_DISTANCE = 40
+DRAW_DISTANCE = 220
+# DRAW_DISTANCE = 100
+
+PUT_FORCE = 100
+CHK_PUT_FORCE = 10
 # ─────────────── DSR API 초기화 ───────────────
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
@@ -75,24 +82,15 @@ class RobotArm(Node):
         # 로봇 초기 자세로 이동
         self.init_robot()
 
-    def init_robot(self):
+    def init_robot(self) -> None:
         """
         로봇팔을 초기 관절 자세로 이동시키고 그리퍼를 닫아서 이동 준비
         """
         set_tool("TW_brkt")       # 사전에 등록된 툴 이름
         set_tcp("RG2_brkt")       # 사전에 등록된 TCP 이름
 
-        # Default Home position
-        # movej([0,0,90,0,90,0], vel=VELOCITY, acc=ACC)
-        # mwait()
+        self.move_home()
 
-        # Home position 1
-        Home = posj([-139.43, -33.86, 146.12, 96.24, 48.81, -20.92])
-        # Home position 2. posj([0,0,90,0,90,0]) 에서 너무 많이 움직임
-        # Home = posj([45.94, 34.72, -146.17, -81.9, 43.76, -20.66])
-        
-        movej(Home, vel=VELOCITY, acc=ACC)
-        mwait()
         gripper.close_gripper(400)
         self.gripper_wait_busy()
         
@@ -109,9 +107,23 @@ class RobotArm(Node):
 
         # self.serve()
         '''
+    
+    def move_home(self) -> None:
+        # Default Home position
+        # movej([0,0,90,0,90,0], vel=VELOCITY, acc=ACC)
+        # mwait()
 
+        # Home position 1
+        Home = posj([-139.43, -33.86, 146.12, 96.24, 48.81, -20.92])
+        # Home position 2. posj([0,0,90,0,90,0]) 에서 너무 많이 움직임
+        # Home = posj([45.94, 34.72, -146.17, -81.9, 43.76, -20.66])
+        
+        movej(Home, vel=VELOCITY, acc=ACC)
+        mwait()
+        
     def move_rel(self, x, y, z, vel=VELOCITY, acc=ACC) -> None:
         movel(pos=[x, y, z, 0, 0, 0], vel=vel, acc=acc, mod=DR_MV_MOD_REL)
+        mwait()
 
     def gripper_wait_busy(self) -> None:
         while True:
@@ -168,7 +180,7 @@ class RobotArm(Node):
         release_force()
         release_compliance_ctrl()
 
-    def pick_target(self, target: Point, width: int) -> None:
+    def pick_target(self, target: Point, width: int) -> bool:
         # target; Point()
         # with; Int8()
         
@@ -188,61 +200,62 @@ class RobotArm(Node):
         gripper.move_gripper(width + WIDTH_MARGIN, 400)
         self.gripper_wait_busy()
         
-        # movel target XZ
+        # movel target XZ + Y+TARGET_MOVING_MARGIN
+        # print current pose for check
         print(get_current_posx()[0])
-        movel(posx([target.x, target.y+50, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+
+        movel(posx([target.x, target.y+TARGET_MOVING_MARGIN, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
 
         # movel target Y
-        movel(posx([target.x, target.y, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+        self.move_rel(0, -TARGET_MOVING_MARGIN-STAB_DISTANCE, 0)
+        # movel(posx([target.x, target.y, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
-
-        # modify position if needed
-        self.move_rel(0, -40, 0)
 
         # gripper grip with width
         # need to optimize gripping force
         gripper.close_gripper(100)
         self.gripper_wait_grip()
-        # adding if gripper not grip pill box
-
-        # relative move Z+10
-        # need to optimize lift distance
-        self.move_rel(0, 0, 10)
+       
+        # relative move Y+3,Z+10
+        # lift motion
+        self.move_rel(0, 3, 10)
         mwait()
 
-        # movel Y-780 place
-        movel(posx([target.x, target.y+220, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+        # movel gripped pill box DRAW motion
+        movel(posx([target.x, target.y+DRAW_DISTANCE, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
-        
+        gripper_width = gripper.get_width()
+        print(gripper_width)
+        # determine if the pill box is grapped
+        if gripper_width < 9.9:
+            return False
+        else:
+            return True
 
-        # # movej rel J0 90 deg for showing
-        # # need to check function
-        # movej([90, 0, 0, 0, 0, 0], vel=VELOCITY, acc=ACC, mod=DR_MV_MOD_REL)
-
-        # # add place motion
-
-        # # gripper release
-        # gripper.move_gripper(width + WIDTH_MARGIN, 400)
-        # self.gripper_wait_busy()
-    
     def put_target(self, width: int) -> None:
-        # movej rel J0 90 deg for showing
-        # need to check function
-        PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
+        # move to put place
+        MIDIUM = posj([-62.69, -0.45, 117.50, 49.52, -37.47, 47.18])
+        # PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
+        PUT = posj([-0.19, 22.57, 53.78, -0.04, 103.13, 269.71])
         # posx([500, 0, 150, 0, -180, -90])
+        movej(MIDIUM, vel=VELOCITY, acc=ACC)
+        mwait()
         movej(PUT, vel=VELOCITY, acc=ACC)
         mwait()
-        self.set_fc('z', -50)
-        self.chk_fc_z(10)
+        # compliance/force ctrl on Z axis
+        self.set_fc('z', -PUT_FORCE)
+        # check force Z axis
+        self.chk_fc_z(CHK_PUT_FORCE)
+        # compliance/force ctrl off
         self.release_fc()
         gripper.move_gripper(width + WIDTH_MARGIN, 400)
         self.gripper_wait_busy()
         movej(PUT, vel=VELOCITY, acc=ACC)
 
-    def serve(self):
-        SERVE1 = posj([-1.55, -9.5, 135.19, -0.02, 54.31, 268.46])
-        # posx([230, 0, -28.5, 0, -180, -90])
+    def serve(self) -> None:
+        SERVE1 = posj([-0.99, 8.81, 117.03, -0.02, 54.16, 269.02])
+        # posx([360, 0, -28.5, 90, -180, 0])
         # SERVE2 = posj([-0.55, 46.01, 58.91, -0.03, 75.07, 269.45])
         # posx([650, 0, -28.5, 0, -180, -90])
         PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
@@ -253,7 +266,7 @@ class RobotArm(Node):
         movej(SERVE1, vel=VELOCITY, acc=ACC)
         mwait()
         # movej(SERVE2, vel=VELOCITY, acc=ACC)
-        self.move_rel(420, 0, 0, 100, 100)
+        self.move_rel(290, 0, 0, 100, 100)
         mwait()
         movej(PUT, vel=VELOCITY, acc=ACC)
         mwait()
@@ -270,21 +283,33 @@ class RobotArm(Node):
         약을 집은 후 다시 초기 위치로 복귀
         """
         
-        targets = request.point
-        widths = request.width
-        self.get_logger().info(f"targets{targets}")
-        self.get_logger().info(f"widths{widths}")
-        for target, width in zip(targets, widths):
+        target = request.point[0]
+        width = request.width[0]
+        self.get_logger().info(f"targets{target}")
+        self.get_logger().info(f"widths{width}")
+        if width > 10_000:
+            self.serve()
+        else:
             try:
-                self.pick_target(target, width)
-                self.put_target(width)
-                response.success = True
-                self.get_logger().info("완료")
-            except Exception as e:
+                assert ( target.x or target.y or target.z ), "target error"
+                try:
+                    assert self.pick_target(target, width), "failed to picking pill box"
+                    self.put_target(width)
+                    response.success = True
+                    self.get_logger().info("완료")
+                except AssertionError as e:
+                    self.get_logger().error(f"실패: {str(e)}")
+                    self.init_robot()
+                    response.success = False
+                except Exception as e:
+                    self.get_logger().error(f"실패: {str(e)}")
+                    self.init_robot()
+                    response.success = False
+            except AssertionError as e:
                 self.get_logger().error(f"실패: {str(e)}")
+                self.init_robot()
                 response.success = False
-                break
-        # self.serve()
+
         self.init_robot()
         return response
 
