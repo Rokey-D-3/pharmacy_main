@@ -17,11 +17,9 @@ from std_msgs.msg import String
 class SymptomMatcher(Node):
     def __init__(self):
         super().__init__('symptom_matcher')
-                                    
-        env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/.env")
 
         # .env 로드 및 OpenAI 키 확인
-        env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_bot/.env")
+        env_path = os.path.expanduser("~/ros2_ws/src/pharmacy_main/resource/.env")
         loaded = load_dotenv(dotenv_path=env_path)
         if not loaded:
             self.get_logger().warn(f".env 파일을 찾을 수 없습니다: {env_path}")
