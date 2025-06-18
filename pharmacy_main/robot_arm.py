@@ -280,8 +280,8 @@ class RobotArm(Node):
         약을 집은 후 다시 초기 위치로 복귀
         """
         
-        target = request.point
-        width = request.width
+        target = request.point[0]
+        width = request.width[0]
         self.get_logger().info(f"targets{target}")
         self.get_logger().info(f"widths{width}")
         
