@@ -81,7 +81,7 @@ class RobotArm(Node):
         # 로봇 초기 자세로 이동
         self.init_robot()
 
-    def init_robot(self):
+    def init_robot(self) -> None:
         """
         로봇팔을 초기 관절 자세로 이동시키고 그리퍼를 닫아서 이동 준비
         """
@@ -250,7 +250,7 @@ class RobotArm(Node):
         self.gripper_wait_busy()
         movej(PUT, vel=VELOCITY, acc=ACC)
 
-    def serve(self):
+    def serve(self) -> None:
         SERVE1 = posj([-1.55, -9.5, 135.19, -0.02, 54.31, 268.46])
         # posx([230, 0, -28.5, 0, -180, -90])
         # SERVE2 = posj([-0.55, 46.01, 58.91, -0.03, 75.07, 269.45])
@@ -286,15 +286,21 @@ class RobotArm(Node):
         self.get_logger().info(f"widths{width}")
         
         try:
-            assert self.pick_target(target, width), "failed to picking pill box"
-            self.put_target(width)
-            response.success = True
-            self.get_logger().info("완료")
+            assert ( target.x or target.y or target.z ), "target error"
+            try:
+                assert self.pick_target(target, width), "failed to picking pill box"
+                self.put_target(width)
+                response.success = True
+                self.get_logger().info("완료")
+            except AssertionError as e:
+                self.get_logger().error(f"실패: {str(e)}")
+                self.init_robot()
+                response.success = False
+            except Exception as e:
+                self.get_logger().error(f"실패: {str(e)}")
+                self.init_robot()
+                response.success = False
         except AssertionError as e:
-            self.get_logger().error(f"실패: {str(e)}")
-            self.init_robot()
-            response.success = False
-        except Exception as e:
             self.get_logger().error(f"실패: {str(e)}")
             self.init_robot()
             response.success = False
