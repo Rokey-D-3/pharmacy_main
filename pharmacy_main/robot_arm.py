@@ -28,8 +28,9 @@ GRIP_MARGIN = 10
 TARGET_MOVING_MARGIN = 50
 STAB_DISTANCE = 40
 DRAW_DISTANCE = 220
+# DRAW_DISTANCE = 100
 
-PUT_FORCE = 50
+PUT_FORCE = 100
 CHK_PUT_FORCE = 10
 # ─────────────── DSR API 초기화 ───────────────
 DR_init.__dsr__id = ROBOT_ID
@@ -211,33 +212,35 @@ class RobotArm(Node):
         # movel(posx([target.x, target.y, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
 
-        # stabbing motion for grip position. compenstate detected distance error
-        self.move_rel(0, -STAB_DISTANCE, 0)
-
         # gripper grip with width
         # need to optimize gripping force
         gripper.close_gripper(100)
         self.gripper_wait_grip()
        
-        # relative move Y+2,Z+10
+        # relative move Y+3,Z+10
         # lift motion
-        self.move_rel(0, 2, 10)
+        self.move_rel(0, 3, 10)
         mwait()
 
         # movel gripped pill box DRAW motion
         movel(posx([target.x, target.y+DRAW_DISTANCE, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
-
+        gripper_width = gripper.get_width()
+        print(gripper_width)
         # determine if the pill box is grapped
-        if gripper.get_width < 9.3:
+        if gripper_width < 9.9:
             return False
         else:
             return True
 
     def put_target(self, width: int) -> None:
         # move to put place
-        PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
+        MIDIUM = posj([-62.69, -0.45, 117.50, 49.52, -37.47, 47.18])
+        # PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
+        PUT = posj([-0.19, 22.57, 53.78, -0.04, 103.13, 269.71])
         # posx([500, 0, 150, 0, -180, -90])
+        movej(MIDIUM, vel=VELOCITY, acc=ACC)
+        mwait()
         movej(PUT, vel=VELOCITY, acc=ACC)
         mwait()
         # compliance/force ctrl on Z axis
@@ -251,8 +254,8 @@ class RobotArm(Node):
         movej(PUT, vel=VELOCITY, acc=ACC)
 
     def serve(self) -> None:
-        SERVE1 = posj([-1.55, -9.5, 135.19, -0.02, 54.31, 268.46])
-        # posx([230, 0, -28.5, 0, -180, -90])
+        SERVE1 = posj([-0.99, 8.81, 117.03, -0.02, 54.16, 269.02])
+        # posx([360, 0, -28.5, 90, -180, 0])
         # SERVE2 = posj([-0.55, 46.01, 58.91, -0.03, 75.07, 269.45])
         # posx([650, 0, -28.5, 0, -180, -90])
         PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
@@ -263,7 +266,7 @@ class RobotArm(Node):
         movej(SERVE1, vel=VELOCITY, acc=ACC)
         mwait()
         # movej(SERVE2, vel=VELOCITY, acc=ACC)
-        self.move_rel(420, 0, 0, 100, 100)
+        self.move_rel(290, 0, 0, 100, 100)
         mwait()
         movej(PUT, vel=VELOCITY, acc=ACC)
         mwait()
@@ -284,28 +287,29 @@ class RobotArm(Node):
         width = request.width[0]
         self.get_logger().info(f"targets{target}")
         self.get_logger().info(f"widths{width}")
-        
-        try:
-            assert ( target.x or target.y or target.z ), "target error"
+        if width > 10_000:
+            self.serve()
+        else:
             try:
-                assert self.pick_target(target, width), "failed to picking pill box"
-                self.put_target(width)
-                response.success = True
-                self.get_logger().info("완료")
+                assert ( target.x or target.y or target.z ), "target error"
+                try:
+                    assert self.pick_target(target, width), "failed to picking pill box"
+                    self.put_target(width)
+                    response.success = True
+                    self.get_logger().info("완료")
+                except AssertionError as e:
+                    self.get_logger().error(f"실패: {str(e)}")
+                    self.init_robot()
+                    response.success = False
+                except Exception as e:
+                    self.get_logger().error(f"실패: {str(e)}")
+                    self.init_robot()
+                    response.success = False
             except AssertionError as e:
                 self.get_logger().error(f"실패: {str(e)}")
                 self.init_robot()
                 response.success = False
-            except Exception as e:
-                self.get_logger().error(f"실패: {str(e)}")
-                self.init_robot()
-                response.success = False
-        except AssertionError as e:
-            self.get_logger().error(f"실패: {str(e)}")
-            self.init_robot()
-            response.success = False
 
-        # self.serve()
         self.init_robot()
         return response
 
