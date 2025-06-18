@@ -6,6 +6,12 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='pharmacy_main',
+            executable='robot_arm',
+            name='robot_arm',
+            output='screen'
+        ),
+        Node(
+            package='pharmacy_main',
             executable='pharmacy_manager',
             name='pharmacy_manager',
             output='screen'
@@ -32,12 +38,6 @@ def generate_launch_description():
             package='pharmacy_main',
             executable='detector',
             name='detector',
-            output='screen'
-        ),
-        Node(
-            package='pharmacy_main',
-            executable='robot_arm',
-            name='robot_arm',
             output='screen'
         ),
     ])
