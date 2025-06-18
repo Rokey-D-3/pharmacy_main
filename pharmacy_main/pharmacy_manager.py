@@ -60,7 +60,6 @@ class PharmacyManager(Node):
                 self.get_logger().info("약 추천 대기중...")
                 return
             
-<<<<<<< HEAD
             self.recommended_list = recommended
             # for drug in recommended:
             #     self.get_logger().info(f"추천된 약: {drug}")
@@ -70,40 +69,15 @@ class PharmacyManager(Node):
             self.recommend_pub.publish(String(data=", ".join(recommended)))
             self.get_logger().info("[디버그] 약 리스트 저장됨. 첫 번째 약 처리 시작.")
             self.process_next_medicine()
-=======
-            # self.get_logger().info(f"추천된 약: {recommended}")
-
-
-
-            # gui_msg = ", ".join(recommended)
-            # self.recommend_pub.publish(String(data=gui_msg))
-            # print('debugging11')
-            # for num, recommend in enumerate(recommended):
-            # #여기서 for문으로 개별 처리
-            #     self.get_logger().info(f"{num+1}번째 : {recommend} 프로세스 실행....") 
-            #     self.process_medicine([recommend])
-            # ##
-
-            # print('debugging22')
->>>>>>> 9de91ba720607219456fdaceac14b7017543d6d4
             return
 
         # 그 외 일반 텍스트 (참고용 로그)
         self.get_logger().info(f"(참고용) 입력 수신: \"{user_input}\"")
 
-<<<<<<< HEAD
     def process_next_medicine(self, medicine_name: str):
         """리스트에서 다음 약 하나 꺼내서 감지 및 집기 진행"""
         if self.current_index >= len(self.recommended_list):
             self.get_logger().info("모든 약 처리 완료")
-=======
-    def process_medicine(self, medicine_name: str):
-
-        
-        result = self.call_detect_position(medicine_name)
-        if not result:
-            self.get_logger().error("약 위치 탐지 실패")
->>>>>>> 9de91ba720607219456fdaceac14b7017543d6d4
             return
 
         drug = self.recommended_list[self.current_index]
@@ -173,47 +147,7 @@ class PharmacyManager(Node):
             self.get_logger().error("추천 결과 없음")
             return []
 
-<<<<<<< HEAD
     def call_detect_position(self, medicine: str):
-=======
-        # 비동기 처리로 변경
-        def response_callback(fut):
-            try:
-                result = fut.result()
-                if result and result.medicine:
-                    recommended = result.medicine
-
-                    self.get_logger().info(f"-추천된 약 : {recommended}")
-
-
-                    gui_msg = ", ".join(recommended)
-                    self.recommend_pub.publish(String(data=gui_msg))
-                    print('debugging11')
-                    for num, recommend in enumerate(recommended):
-                    #여기서 for문으로 개별 처리
-                        self.get_logger().info(f"{num+1}번째 : {recommend} 프로세스 실행....") 
-                        self.process_medicine([recommend])
-
-
-                    # self.process_medicine(result.medicine)
-
-
-
-
-
-                    print('뿅')
-                else:
-                    self.get_logger().info("약 정보 대기중")
-            except Exception as e:
-                self.get_logger().error(f"서비스 응답 처리 중 예외 발생: {e}")
-        future.add_done_callback(response_callback)
-
-
-        # rclpy.spin_until_future_complete(self, future)
-        # return future.result().medicine if future.result() else None
-
-    def call_detect_position(self, medicine):
->>>>>>> 9de91ba720607219456fdaceac14b7017543d6d4
         if not self.detect_position_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().error("/get_3d_position 서비스 연결 실패")
             return None
