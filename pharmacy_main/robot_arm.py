@@ -25,6 +25,12 @@ gripper = RG(GRIPPER_NAME, TOOLCHARGER_IP, TOOLCHARGER_PORT)
 
 WIDTH_MARGIN = 80
 GRIP_MARGIN = 10
+TARGET_MOVING_MARGIN = 50
+STAB_DISTANCE = 40
+DRAW_DISTANCE = 220
+
+PUT_FORCE = 50
+CHK_PUT_FORCE = 10
 # ─────────────── DSR API 초기화 ───────────────
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
@@ -82,17 +88,8 @@ class RobotArm(Node):
         set_tool("TW_brkt")       # 사전에 등록된 툴 이름
         set_tcp("RG2_brkt")       # 사전에 등록된 TCP 이름
 
-        # Default Home position
-        # movej([0,0,90,0,90,0], vel=VELOCITY, acc=ACC)
-        # mwait()
+        self.move_home()
 
-        # Home position 1
-        Home = posj([-139.43, -33.86, 146.12, 96.24, 48.81, -20.92])
-        # Home position 2. posj([0,0,90,0,90,0]) 에서 너무 많이 움직임
-        # Home = posj([45.94, 34.72, -146.17, -81.9, 43.76, -20.66])
-        
-        movej(Home, vel=VELOCITY, acc=ACC)
-        mwait()
         gripper.close_gripper(400)
         self.gripper_wait_busy()
         
@@ -109,9 +106,23 @@ class RobotArm(Node):
 
         # self.serve()
         '''
+    
+    def move_home(self) -> None:
+        # Default Home position
+        # movej([0,0,90,0,90,0], vel=VELOCITY, acc=ACC)
+        # mwait()
 
+        # Home position 1
+        Home = posj([-139.43, -33.86, 146.12, 96.24, 48.81, -20.92])
+        # Home position 2. posj([0,0,90,0,90,0]) 에서 너무 많이 움직임
+        # Home = posj([45.94, 34.72, -146.17, -81.9, 43.76, -20.66])
+        
+        movej(Home, vel=VELOCITY, acc=ACC)
+        mwait()
+        
     def move_rel(self, x, y, z, vel=VELOCITY, acc=ACC) -> None:
         movel(pos=[x, y, z, 0, 0, 0], vel=vel, acc=acc, mod=DR_MV_MOD_REL)
+        mwait()
 
     def gripper_wait_busy(self) -> None:
         while True:
@@ -168,7 +179,7 @@ class RobotArm(Node):
         release_force()
         release_compliance_ctrl()
 
-    def pick_target(self, target: Point, width: int) -> None:
+    def pick_target(self, target: Point, width: int) -> bool:
         # target; Point()
         # with; Int8()
         
@@ -188,53 +199,52 @@ class RobotArm(Node):
         gripper.move_gripper(width + WIDTH_MARGIN, 400)
         self.gripper_wait_busy()
         
-        # movel target XZ
+        # movel target XZ + Y+TARGET_MOVING_MARGIN
+        # print current pose for check
         print(get_current_posx()[0])
-        movel(posx([target.x, target.y+50, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+
+        movel(posx([target.x, target.y+TARGET_MOVING_MARGIN, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
 
         # movel target Y
-        movel(posx([target.x, target.y, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+        self.move_rel(0, -TARGET_MOVING_MARGIN-STAB_DISTANCE, 0)
+        # movel(posx([target.x, target.y, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
 
-        # modify position if needed
-        self.move_rel(0, -40, 0)
+        # stabbing motion for grip position. compenstate detected distance error
+        self.move_rel(0, -STAB_DISTANCE, 0)
 
         # gripper grip with width
         # need to optimize gripping force
         gripper.close_gripper(100)
         self.gripper_wait_grip()
-        # adding if gripper not grip pill box
-
-        # relative move Z+10
-        # need to optimize lift distance
-        self.move_rel(0, 0, 10)
+       
+        # relative move Y+2,Z+10
+        # lift motion
+        self.move_rel(0, 2, 10)
         mwait()
 
-        # movel Y-780 place
-        movel(posx([target.x, target.y+220, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
+        # movel gripped pill box DRAW motion
+        movel(posx([target.x, target.y+DRAW_DISTANCE, target.z, 90, -90, -90]), vel=VELOCITY, acc=ACC)
         mwait()
-        
 
-        # # movej rel J0 90 deg for showing
-        # # need to check function
-        # movej([90, 0, 0, 0, 0, 0], vel=VELOCITY, acc=ACC, mod=DR_MV_MOD_REL)
+        # determine if the pill box is grapped
+        if gripper.get_width < 9.3:
+            return False
+        else:
+            return True
 
-        # # add place motion
-
-        # # gripper release
-        # gripper.move_gripper(width + WIDTH_MARGIN, 400)
-        # self.gripper_wait_busy()
-    
     def put_target(self, width: int) -> None:
-        # movej rel J0 90 deg for showing
-        # need to check function
+        # move to put place
         PUT = posj([-0.71, 18.93, 74.09, -0.03, 86.98, 269.29])
         # posx([500, 0, 150, 0, -180, -90])
         movej(PUT, vel=VELOCITY, acc=ACC)
         mwait()
-        self.set_fc('z', -50)
-        self.chk_fc_z(10)
+        # compliance/force ctrl on Z axis
+        self.set_fc('z', -PUT_FORCE)
+        # check force Z axis
+        self.chk_fc_z(CHK_PUT_FORCE)
+        # compliance/force ctrl off
         self.release_fc()
         gripper.move_gripper(width + WIDTH_MARGIN, 400)
         self.gripper_wait_busy()
@@ -270,20 +280,25 @@ class RobotArm(Node):
         약을 집은 후 다시 초기 위치로 복귀
         """
         
-        targets = request.point
-        widths = request.width
-        self.get_logger().info(f"targets{targets}")
-        self.get_logger().info(f"widths{widths}")
-        for target, width in zip(targets, widths):
-            try:
-                self.pick_target(target, width)
-                self.put_target(width)
-                response.success = True
-                self.get_logger().info("완료")
-            except Exception as e:
-                self.get_logger().error(f"실패: {str(e)}")
-                response.success = False
-                break
+        target = request.point
+        width = request.width
+        self.get_logger().info(f"targets{target}")
+        self.get_logger().info(f"widths{width}")
+        
+        try:
+            assert self.pick_target(target, width), "failed to picking pill box"
+            self.put_target(width)
+            response.success = True
+            self.get_logger().info("완료")
+        except AssertionError as e:
+            self.get_logger().error(f"실패: {str(e)}")
+            self.init_robot()
+            response.success = False
+        except Exception as e:
+            self.get_logger().error(f"실패: {str(e)}")
+            self.init_robot()
+            response.success = False
+
         # self.serve()
         self.init_robot()
         return response
