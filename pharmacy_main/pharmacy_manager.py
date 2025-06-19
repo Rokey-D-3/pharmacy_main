@@ -88,6 +88,7 @@ class PharmacyManager(Node):
 
         position, width = result
 
+        if 
 
         # point = Point()
         # point.x, point.y, point.z = position
@@ -136,14 +137,7 @@ class PharmacyManager(Node):
                     #여기서 for문으로 개별 처리
                         self.get_logger().info(f"{num+1}번째 : {recommend} 프로세스 실행....") 
                         self.process_medicine([recommend])
-
-
                     # self.process_medicine(result.medicine)
-
-
-
-
-
                     print('뿅')
                 else:
                     self.get_logger().info("약 정보 대기중")

@@ -82,7 +82,7 @@ class WakeupWord:
 class STT:
     def __init__(self, api_key):
         self.api_key = api_key
-        self.duration = 2
+        self.duration = 3
         self.samplerate = 16000
 
     def speech2text(self):

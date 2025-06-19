@@ -53,10 +53,10 @@ Drug Name: Ethosuximide is a complementary antiepileptic medicine.
 Uses / Indications: absence seizures.
 ==================================================
 Drug Name: Substances (1971).
-Uses / Indications: generalized tonic–clonic  seizures; partial seizures; neonatal seizures;
+Uses / Indications: generalized tonicâ€“clonic  seizures; partial seizures; neonatal seizures;
 ==================================================
 Drug Name: and dispensing.
-Uses / Indications: generalized tonic–clonic seizures; partial seizures; status epilepticus.
+Uses / Indications: generalized tonicâ€“clonic seizures; partial seizures; status epilepticus.
 ==================================================
 Drug Name: Diethylcarbamazine is a complementary antifilarial medicine.
 Uses / Indications: systemic lymphatic filariasis and occult filariasis; loiasis; tissue nematode
@@ -95,7 +95,7 @@ Drug Name: other form of antimicrobial therapy.
 Uses / Indications: severe life-threatening infections, particularly those caused by
 ==================================================
 Drug Name: alternatives.
-Uses / Indications: gastroenteritis (including cholera, shigellosis, travellers’ diarrhoea,
+Uses / Indications: gastroenteritis (including cholera, shigellosis, travellersâ€™ diarrhoea,
 ==================================================
 Drug Name: Clindamycin is a complementary list medicine for use when penicillin is not appropriate.
 Uses / Indications: staphylococcal bone and joint infections, pyomyositis; necrotizing
@@ -104,7 +104,7 @@ Drug Name: children under 12 years is contraindicated.
 Uses / Indications: supplement to quinine or artesunate treatment for multidrug-resistant
 ==================================================
 Drug Name: alternatives.
-Uses / Indications: alternative to penicillin in hypersensitive patients; sinusitis; otitis externa;  oral infections; cholera; respiratory tract infections (including pneumonia  and legionnaires’ disease); syphilis; chancroid; chlamydia; neonatal  chlamydial conjunctivitis; non-gonococcal urethritis; prostatitis;  lymphogranuloma venereum; campylobacter enteritis; relapsing fever; skin  infections; diphtheria; diphtheria and whooping cough prophylaxis; Q fever  in children.
+Uses / Indications: alternative to penicillin in hypersensitive patients; sinusitis; otitis externa;  oral infections; cholera; respiratory tract infections (including pneumonia  and legionnairesâ€™ disease); syphilis; chancroid; chlamydia; neonatal  chlamydial conjunctivitis; non-gonococcal urethritis; prostatitis;  lymphogranuloma venereum; campylobacter enteritis; relapsing fever; skin  infections; diphtheria; diphtheria and whooping cough prophylaxis; Q fever  in children.
 ==================================================
 Drug Name: as alternatives.
 Uses / Indications: pneumonia; cholecystitis; peritonitis; septicaemia; acute pyelonephritis;
@@ -139,8 +139,8 @@ Uses / Indications: adjunct to amphotericin B (or fluconazole) in cryptococcal m
 Drug Name: Potassium iodide is a complementary list medicine.
 Uses / Indications: sporotrichosis; subcutaneous phycomycosis; thyrotoxicosis
 ==================================================
-Drug Name: virus and varicella–zoster virus. Various medicines can serve as alternatives.
-Uses / Indications: treatment of primary genital herpes; disseminated varicella–zoster
+Drug Name: virus and varicellaâ€“zoster virus. Various medicines can serve as alternatives.
+Uses / Indications: treatment of primary genital herpes; disseminated varicellaâ€“zoster
 ==================================================
 Drug Name: also been used for another medicine.
 Uses / Indications: HIV infection in combination with at least one other antiretroviral
@@ -163,7 +163,7 @@ Uses / Indications: HIV infection in combination with at least two other antiret
 Drug Name: 42%.
 Uses / Indications: HIV infection in combination with at least two other antiretroviral
 ==================================================
-Drug Name: manufacturer’s literature for details).
+Drug Name: manufacturerâ€™s literature for details).
 Uses / Indications: treatment of haemorrhagic fever, including Lassa fever, Argentine
 ==================================================
 Drug Name: medicines can serve as alternatives.
@@ -212,7 +212,7 @@ Drug Name: Bleomycin is a complementary list cytotoxic medicine.
 Uses / Indications: adjunct to surgery and radiotherapy in palliative treatment of Hodgkin  and non-Hodgkin lymphomas; reticulum cell sarcoma and lymphoma;  carcinomas of the head, neck, larynx, cervix, penis, skin, vulva, testicles;  embryonal cell carcinoma, choriocarcinoma, and teratoma; malignant  effusions.
 ==================================================
 Drug Name: Calcium folinate is a complementary list medicine.
-Uses / Indications: antidote in high-dose methotrexate therapy (as a ‘folate rescue’);
+Uses / Indications: antidote in high-dose methotrexate therapy (as a â€˜folate rescueâ€™);
 ==================================================
 Drug Name: Chlorambucil is a complementary list cytotoxic medicine.
 Uses / Indications: chronic lymphocytic leukaemia; some non-Hodgkin lymphomas;  Hodgkin disease, and Waldenstrom (primary) macroglobulinaemia.
@@ -286,7 +286,7 @@ Uses / Indications: replacement therapy for factor IX deficiency in haemophilia 
 Drug Name: coagulation factor preparation. Various preparations can serve as alternatives.
 Uses / Indications: control of haemorrhage in haemophilia A.
 ==================================================
-Drug Name: equivalent; consult individual manufacturer’s product literature.
+Drug Name: equivalent; consult individual manufacturerâ€™s product literature.
 Uses / Indications: replacement therapy in primary immunodeficiency, Kawasaki disease.
 ==================================================
 Drug Name: medicines can serve as alternatives.
@@ -416,7 +416,7 @@ Drug Name: alternatives.
 Uses / Indications: ulcerative colitis; Crohn disease; severe rheumatoid arthritis (section 2.4).
 ==================================================
 Drug Name: Senna is a representative stimulant laxative. Various medicines can serve as alternatives.
-Uses / Indications: constipation (acts in 8–12 hours).
+Uses / Indications: constipation (acts in 8â€“12 hours).
 ==================================================
 Drug Name: Administration of more concentrated solutions can result in hypernatraemia.
 Uses / Indications: dehydration from acute diarrhoea.
@@ -478,19 +478,19 @@ Uses / Indications: passive immunization in suspected cases of diphtheria.
 Drug Name: (Revised 1992). WHO Technical Report Series No 840, 1994, Annex 2.
 Uses / Indications: passive immunization either post-exposure or in suspected exposure to  rabies in high-risk countries in unimmunized individuals (in conjunction  with rabies vaccine).
 ==================================================
-Drug Name: required before administration; consult manufacturer’s literature
+Drug Name: required before administration; consult manufacturerâ€™s literature
 Uses / Indications: active immunization against cholera.
 ==================================================
 Drug Name: component (see also under Pertussis).
 Uses / Indications: active immunization against diphtheria, tetanus, and pertussis.
 ==================================================
-Drug Name: manufacturer’s information)
+Drug Name: manufacturerâ€™s information)
 Uses / Indications: active immunization against Haemophilus influenzae type b.
 ==================================================
 Drug Name: Injection, inactivated hepatitis A virus.
 Uses / Indications: active immunization against hepatitis A.
 ==================================================
-Drug Name: manufacturers; consult individual manufacturer’s literature.
+Drug Name: manufacturers; consult individual manufacturerâ€™s literature.
 Uses / Indications: active immunization against Japanese encephalitis.
 ==================================================
 Drug Name: NOTE. Both powder for reconstitution and suspension preparations are available.
@@ -508,7 +508,7 @@ Uses / Indications: active immunization against poliomyelitis.
 Drug Name: information).
 Uses / Indications: active immunization against rotavirus infection.
 ==================================================
-Drug Name: (consult individual manufacturer’s literature for further information).
+Drug Name: (consult individual manufacturerâ€™s literature for further information).
 Uses / Indications: active immunization against typhoid.
 ==================================================
 Drug Name: Injection, live, attenuated varicella-zoster virus.
@@ -547,7 +547,7 @@ Uses / Indications: ocular hypertension; chronic open-angle glaucoma, aphakic gl
 Drug Name: the main list cannot be made available.
 Uses / Indications: chronic open-angle glaucoma, ocular hypertension (section 21.4);
 ==================================================
-Drug Name: NOTE. Injection requires transport by “cold chain” and refrigerated storage.
+Drug Name: NOTE. Injection requires transport by â€œcold chainâ€ and refrigerated storage.
 Uses / Indications: prevention and treatment of postpartum and post-abortion haemorrhage
 ==================================================
 Drug Name: law and where culturally acceptable.
@@ -624,4 +624,34 @@ Uses / Indications: prevention of dental caries.
 ==================================================
 Drug Name: Also known as Vitamin B1.
 Uses / Indications: prevention and treatment of vitamin B1 deficiency.
+==================================================
+Drug 1
+Use: For common cold symptoms such as fever, nasal congestion, chills, sore throat, and cough.
+==================================================
+Drug 2
+Use: Liquid cold medicine for relieving cough, sore throat, and fever. Suitable for children and adults.
+==================================================
+Drug 3
+Use: For reducing fever and relieving pain such as headaches, muscle aches, and menstrual pain.
+==================================================
+Drug 4
+Use: Used to relieve mild to moderate pain and reduce fever. Effective for headaches, toothaches, and cramps.
+==================================================
+Drug 5
+Use: Digestive aid for bloating, indigestion, and discomfort after meals.
+==================================================
+Drug 6
+Use: For improving gut health and supporting immune function, often used for mild diarrhea.
+==================================================
+Drug 7
+Use: Antiseptic used to disinfect minor wounds and prevent infection.
+==================================================
+Drug 8
+Use: Pain relief patch for muscle pain, joint pain, and bruises.
+==================================================
+Drug 9
+Use: Sterile bandage used to cover and protect minor wounds or cuts.
+==================================================
+Drug 10
+Use: Artificial tears for dry eyes, eye fatigue, and irritation from contact lenses.
 ==================================================
