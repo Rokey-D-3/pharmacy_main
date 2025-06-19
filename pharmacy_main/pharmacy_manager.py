@@ -1,8 +1,10 @@
 import os
 import rclpy
+import time
 from rclpy.node import Node
 from std_msgs.msg import String
 from geometry_msgs.msg import Point
+from std_srvs.srv import Trigger
 
 from pharmacy_msgs.srv import GetMedicineName, PickupMedicine, SrvDepthPosition
 
@@ -27,6 +29,7 @@ class PharmacyManager(Node):
         self.get_medicine_client = self.create_client(GetMedicineName, '/get_medicine_name')
         self.detect_position_client = self.create_client(SrvDepthPosition, '/get_3d_position')
         self.pickup_client = self.create_client(PickupMedicine, '/pickup_medicine')
+        self.return_home_client = self.create_client(Trigger, '/return_home')
 
         self.recommend_pub = self.create_publisher(String, '/recommended_drug', 10)
         
@@ -78,37 +81,60 @@ class PharmacyManager(Node):
         # 그 외에는 단순 텍스트 로그만
         self.get_logger().info(f"(참고용) 입력 수신: \"{user_input}\"")
 
-    def process_medicine(self, medicine_name: str):
-
-        
-        result = self.call_detect_position(medicine_name)
-        if not result:
-            self.get_logger().error("약 위치 탐지 실패")
+    def return_robot_home(self):
+        if not self.return_home_client.wait_for_service(timeout_sec=2.0):
+            self.get_logger().error("/return_home 서비스 연결 실패")
             return
-
-        position, width = result
-
-
-        # point = Point()
-        # point.x, point.y, point.z = position
-        # point.orientation.w = 1.0
-        # temp=[]
-        # temp.append(width)
-
-        
-        self.get_logger().info(f"{medicine_name}의 위치: {position}")
-        self.get_logger().info(f"{medicine_name}의 폭: {width}")
-        # self.get_logger().info(f"{medicine_name}: {type(width)}")
-        # self.get_logger().info(f"temp0: {temp[0]}")
-        # self.get_logger().info(f"temp1: {temp[1]}")
-        # self.get_logger().info(f"temp: {type(temp)}")
-        
-        success = self.call_pickup(position, width)
-        if success:
-            self.get_logger().info("약 집기 성공")
+        req = Trigger.Request()
+        future = self.return_home_client.call_async(req)
+        rclpy.spin_until_future_complete(self, future)
+        if future.result().success:
+            self.get_logger().info("로봇 홈 복귀 완료")
         else:
-            self.get_logger().error("약 집기 실패")
+            self.get_logger().error("로봇 홈 복귀 실패")
+    
+    def process_medicine(self, medicine_name: str, retry: int = 2):
+        for attempt in range(retry + 1):
+            try:
+                self.get_logger().info(f"[{medicine_name}] 처리 시도 {attempt+1}/{retry+1}")
 
+                result = self.call_detect_position(medicine_name)
+                if not result or self._is_invalid_position(result[0]):
+                    self.get_logger().warn(f"[{medicine_name}] 감지 실패")
+                    self.return_robot_home()
+                    if attempt < retry:
+                        time.sleep(1.5)
+                    continue
+
+                position, width = result
+                self.get_logger().info(f"{medicine_name}의 위치: {position}")
+                self.get_logger().info(f"{medicine_name}의 폭: {width}")
+
+                success = self.call_pickup(position, width)
+                if success:
+                    self.get_logger().info("약 집기 성공")
+                    return
+                else:
+                    self.get_logger().warn(f"{medicine_name} 집기 실패 → 감지부터 재시도 예정")
+                    self.return_robot_home()
+                    if attempt < retry:
+                        time.sleep(1.5)
+                    continue
+
+            except Exception as e:
+                self.get_logger().error(f"{medicine_name} 처리 중 예외 발생: {e}")
+                self.return_robot_home()
+                if attempt < retry:
+                    time.sleep(1.5)
+                continue
+
+        self.get_logger().error(f"{medicine_name} 처리 실패 — 최종 포기")
+
+
+    def _is_invalid_position(self, points: list[Point]) -> bool:
+        p = points[0]
+        return p.x == 0.0 and p.y == 0.0 and p.z == 0.0
+    
     def call_get_medicine_name(self, symptom: str) -> str:
         if not self.get_medicine_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().error("/get_medicine_name 서비스 연결 실패")
@@ -154,42 +180,28 @@ class PharmacyManager(Node):
         # return future.result().medicine if future.result() else None
 
     def call_detect_position(self, medicine):
-        if not self.detect_position_client.wait_for_service(timeout_sec=2.0):
-            self.get_logger().error("/get_3d_position 서비스 연결 실패")
+        try:
+            if not self.detect_position_client.wait_for_service(timeout_sec=2.0):
+                self.get_logger().error("/get_3d_position 서비스 연결 실패")
+                return None
+
+            request = SrvDepthPosition.Request()
+            request.target = medicine
+            future = self.detect_position_client.call_async(request)
+            rclpy.spin_until_future_complete(self, future)
+
+            result = future.result()
+
+            # 결과가 없거나 비어있으면 실패로 간주
+            if result is None or not result.depth_position:
+                self.get_logger().warn(f"{medicine} 위치 탐지 실패 — 응답 없음")
+                return None
+
+            return result.depth_position, result.width
+
+        except Exception as e:
+            self.get_logger().error(f"{medicine} 감지 중 예외 발생: {e}")
             return None
-
-        request = SrvDepthPosition.Request()
-        request.target = medicine
-        future = self.detect_position_client.call_async(request)
-
-        # 비동기 처리로 변경
-        # def response_callback(fut):
-        #     try:
-        #         result = fut.result()
-        #         if result :
-        #             self.get_logger().info(f"약 위치 정보: {result.depth_position}")
-        #             self.get_logger().info(f"그리퍼 넓이 정보: {result.width}")
-        #             self.process_medicine(result.medicine)
-        #         else:
-        #             self.get_logger().info("타깃 정보 대기중")
-        #     except Exception as e:
-        #         self.get_logger().error(f"서비스 응답 처리 중 예외 발생: {e}")
-        # future.add_done_callback(response_callback)
-        rclpy.spin_until_future_complete(self, future)
-
-        result = future.result()
-
-
-        print("reslut_test : ",result)
-
-
-        # if not result or sum(result.depth_position) == 0.0:
-        #     return None
-        
-
-
-        print('!asdfasdf')
-        return result.depth_position, result.width
 
     def call_pickup(self, point: Point, width) -> bool:
         if not self.pickup_client.wait_for_service(timeout_sec=2.0):

@@ -3,6 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Point
 # from std_msgs.msg import UInt16
 from pharmacy_msgs.srv import PickupMedicine  # Point[], UInt16[] → bool 응답 서비스
+from std_srvs.srv import Trigger
 
 import time
 
@@ -76,8 +77,8 @@ class RobotArm(Node):
             '/pickup_medicine',
             self.pickup_callback
         )
-
-        self.get_logger().info('Robot Arm 서비스 시작됨 (/pickup_medicine)')
+        self.create_service(Trigger, '/return_home', self.return_home_callback)  
+        self.get_logger().info('Robot Arm 서비스 시작됨 (/pickup_medicine, /return_home)')
 
         # 로봇 초기 자세로 이동
         self.init_robot()
@@ -121,6 +122,13 @@ class RobotArm(Node):
         movej(Home, vel=VELOCITY, acc=ACC)
         mwait()
         
+    def return_home_callback(self, request, response):
+        self.get_logger().info("홈 위치로 복귀 요청 수신 → move_home 실행")
+        self.move_home()
+        response.success = True
+        response.message = "홈 복귀 완료"
+        return response
+    
     def move_rel(self, x, y, z, vel=VELOCITY, acc=ACC) -> None:
         movel(pos=[x, y, z, 0, 0, 0], vel=vel, acc=acc, mod=DR_MV_MOD_REL)
         mwait()
