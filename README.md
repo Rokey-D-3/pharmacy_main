@@ -1,4 +1,4 @@
-# 💊 PharmacyBot: AI-based Automated Pharmacy System
+# 💊 PharmacyBot: Voice-Driven Medicine Recommendation & Robotic Dispensing System
 
 > “AI가 듣고, 이해하고, 직접 약을 꺼내주는 약국 자동화 솔루션”
 
