@@ -21,16 +21,7 @@ PharmacyBot은 심야, 공휴일 등 **약국 이용이 어려운 시간대에�
 
 ## 🛠 System Architecture
 
-graph TD
-    A[Voice Input] --> B[STT Processing]
-    B --> C[Symptom Analysis]
-    C --> D[Drug Recommendation]
-    D --> E[GUI Display]
-    E --> F[Object Detection]
-    F --> G[Position Estimation]
-    G --> H[Robot Arm Pickup]
-    H --> I[Deliver to User]
-
+<img width="1094" height="311" alt="제목 없는 다이어그램-페이지-3 drawio" src="https://github.com/user-attachments/assets/a1364533-56f2-4aef-a0c9-7560709fb5fa" />
 
 ---
 
