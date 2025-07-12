@@ -21,17 +21,16 @@ PharmacyBot은 심야, 공휴일 등 **약국 이용이 어려운 시간대에�
 
 ## 🛠 System Architecture
 
-```mermaid
 graph TD
-    A[사용자 음성 입력] --> B[음성 인식 (STT)]
-    B --> C[증상 분석 및 번역]
-    C --> D[LLM 기반 약 추천]
-    D --> E[추천 약 리스트 GUI 표시]
-    E --> F[YOLO 객체 탐지]
-    F --> G[약 위치 탐색 및 좌표 추출]
-    G --> H[로봇팔 제어 및 약 픽업]
-    H --> I[사용자에게 전달]
-```
+    A[Voice Input] --> B[STT Processing]
+    B --> C[Symptom Analysis]
+    C --> D[Drug Recommendation]
+    D --> E[GUI Display]
+    E --> F[Object Detection]
+    F --> G[Position Estimation]
+    G --> H[Robot Arm Pickup]
+    H --> I[Deliver to User]
+
 
 ---
 
